@@ -20,10 +20,12 @@ def send_msg_to_llm(logs):
     stream = ollama.chat(
         model='llama3.1',
         messages=[{'role': 'user', 'content': '{}'.format(prompt)}],
-        stream=True,
+        stream=False,
     )
-    for chunk in stream:
-        print(chunk['message']['content'], end='', flush=True)
+    return stream['message']['content']
+    # for chunk in stream:
+    #     print(chunk['message']['content'], end='', flush=True)
+
 
 # loader = WebBaseLoader(
 #     web_paths=("https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",),
