@@ -7,22 +7,22 @@ from langchain_community.embeddings import OllamaEmbeddings
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 
-def send_msg_to_llm(logs):
+# def send_msg_to_llm(logs):
 
-    prompt = f"""
-    Analyze the following logs and provide a summary with identified issues and recommendations. Structure your response in JSON format with the following keys:
-    - issues: A list of detected issues.
-    - recommendations: Suggestions to resolve the issues.
-    - summary: A brief summary of the overall log condition.
+#     prompt = f"""
+#     Analyze the following logs and provide a summary with identified issues and recommendations. Structure your response in JSON format with the following keys:
+#     - issues: A list of detected issues.
+#     - recommendations: Suggestions to resolve the issues.
+#     - summary: A brief summary of the overall log condition.
     
-    Logs: {logs}
-    """
-    stream = ollama.chat(
-        model='llama3.1',
-        messages=[{'role': 'user', 'content': '{}'.format(prompt)}],
-        stream=False,
-    )
-    return stream['message']['content']
+#     Logs: {logs}
+#     """
+#     stream = ollama.chat(
+#         model='llama3.1',
+#         messages=[{'role': 'user', 'content': '{}'.format(prompt)}],
+#         stream=False,
+#     )
+#     return stream['message']['content']
     # for chunk in stream:
     #     print(chunk['message']['content'], end='', flush=True)
 
@@ -60,3 +60,30 @@ def send_msg_to_llm(logs):
 #     formatted_context = format_docs(retrieved_docs)
 #     return ollama_llm(question, formatted_context)
 
+import requests
+
+
+
+API_BASE_URL = "https://api.cloudflare.com/client/v4/accounts/c886e2113615b3fe3a957a568dbb03cf/ai/run/"
+headers = {"Authorization": "Bearer 0hpaiksD7YysCCWIFJdk1AzMkYtw3TRtJjw_pWeK"}
+
+
+def run(model, inputs):
+    input = { "messages": inputs }
+    response = requests.post(f"{API_BASE_URL}{model}", headers=headers, json=input)
+    return response.json()
+
+
+inputs = [
+    { "role": "system", "content": "You are a docker container analysis tool" },
+    { "role": "user", "content": f"""
+#     Analyze the following logs and provide a summary with identified issues and recommendations. Structure your response in JSON format with the following keys:
+#     - issues: A list of detected issues.
+#     - recommendations: Suggestions to resolve the issues.
+#     - summary: A brief summary of the overall log condition.
+    
+#     Logs: {logs}
+#     """}
+];
+output = run("@cf/meta/llama-3-8b-instruct", inputs)
+print(output)

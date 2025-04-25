@@ -1,7 +1,6 @@
 import json
 import time
 from confluent_kafka import Consumer, KafkaError
-
 from src.feedback_generator import take_feedback
 from src.llm import send_msg_to_llm
 
@@ -47,6 +46,7 @@ def consume_logs():
             #feedback = send_msg_to_llm(str(logs))
             chat_output = send_msg_to_llm(str(logs))
             print(chat_output)
+            
             feedback_prompt = take_feedback()
             feedback_reply = send_msg_to_llm(feedback_prompt)
             print(feedback_reply)
